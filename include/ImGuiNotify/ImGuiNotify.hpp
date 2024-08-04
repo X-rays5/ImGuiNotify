@@ -19,47 +19,10 @@
 #include <chrono>			// For the notifications timed dissmiss
 #include <functional>		// For storing the code, which executest on the button click in the notification
 
-#include "imgui.h"
-#include "imgui_internal.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
-#include "IconsFontAwesome6.h"
-
-
-
-
-
-
-
-
-
-/**
- * CONFIGURATION SECTION Start
-*/
-
-#define NOTIFY_MAX_MSG_LENGTH				4096		// Max message content length
-#define NOTIFY_PADDING_X					20.f		// Bottom-left X padding
-#define NOTIFY_PADDING_Y					20.f		// Bottom-left Y padding
-#define NOTIFY_PADDING_MESSAGE_Y			10.f		// Padding Y between each message
-#define NOTIFY_FADE_IN_OUT_TIME				150			// Fade in and out duration
-#define NOTIFY_DEFAULT_DISMISS				3000		// Auto dismiss after X ms (default, applied only of no data provided in constructors)
-#define NOTIFY_OPACITY						0.8f		// 0-1 Toast opacity
-#define NOTIFY_USE_SEPARATOR 				false 		// If true, a separator will be rendered between the title and the content
-#define NOTIFY_USE_DISMISS_BUTTON			true		// If true, a dismiss button will be rendered in the top right corner of the toast
-#define NOTIFY_RENDER_LIMIT					5			// Max number of toasts rendered at the same time. Set to 0 for unlimited
-
-// Warning: Requires ImGui docking with multi-viewport enabled
-#define NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW	true		// If true, the notifications will be rendered in the corner of the monitor, otherwise in the corner of the main window
-
-/**
- * CONFIGURATION SECTION End
-*/
-
-
-
-
-
-
-
+#include "../../fa_header/IconsFontAwesome6.hpp"
 
 static const ImGuiWindowFlags NOTIFY_DEFAULT_TOAST_FLAGS = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
 
@@ -464,6 +427,7 @@ public:
 namespace ImGui
 {
     inline std::vector<ImGuiToast> notifications;
+    inline std::recursive_mutex notificationsMutex;
 
     /**
      * Inserts a new notification into the notification queue.
@@ -471,6 +435,7 @@ namespace ImGui
      */
     inline void InsertNotification(const ImGuiToast& toast)
     {
+        std::lock_guard lock(notificationsMutex);
         notifications.push_back(toast);
     }
 
@@ -481,6 +446,7 @@ namespace ImGui
      */
     inline void RemoveNotification(int index)
     {
+        std::lock_guard lock(notificationsMutex);
         notifications.erase(notifications.begin() + index);
     }
 
@@ -495,6 +461,7 @@ namespace ImGui
 
         float height = 0.f;
 
+        std::lock_guard lock(notificationsMutex);
         for (size_t i = 0; i < notifications.size(); ++i)
         {
             ImGuiToast* currentToast = &notifications[i];
