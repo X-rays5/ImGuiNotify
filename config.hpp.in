@@ -1,0 +1,37 @@
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+
+// Max message content length
+#define NOTIFY_MAX_MSG_LENGTH @NOTIFY_MAX_MSG_LENGTH@
+
+// Bottom-left X padding
+#define NOTIFY_PADDING_X @NOTIFY_PADDING_X@
+
+// Bottom-left Y padding
+#define NOTIFY_PADDING_Y @NOTIFY_PADDING_Y@
+
+// Padding Y between each message
+#define NOTIFY_PADDING_MESSAGE_Y @NOTIFY_PADDING_MESSAGE_Y@
+
+// Fade in and out duration
+#define NOTIFY_FADE_IN_OUT_TIME @NOTIFY_FADE_IN_OUT_TIME@
+
+// Auto dismiss after X ms (default, applied only if no data provided in constructors)
+#define NOTIFY_DEFAULT_DISMISS @NOTIFY_DEFAULT_DISMISS@
+
+// 0-1 Toast opacity
+#define NOTIFY_OPACITY @NOTIFY_OPACITY@
+
+// If true, a separator will be rendered between the title and the content
+#define NOTIFY_USE_SEPARATOR @NOTIFY_USE_SEPARATOR@
+
+// If true, a dismiss button will be rendered in the top right corner of the toast
+#define NOTIFY_USE_DISMISS_BUTTON @NOTIFY_USE_DISMISS_BUTTON@
+
+// Max number of toasts rendered at the same time. Set to 0 for unlimited
+#define NOTIFY_RENDER_LIMIT @NOTIFY_RENDER_LIMIT@
+
+// If true, the notifications will be rendered in the corner of the monitor, otherwise in the corner of the main window (requires ImGui docking)
+#define NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW @NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW@
+
+#endif // CONFIG_HPP
