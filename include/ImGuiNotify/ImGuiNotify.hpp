@@ -460,7 +460,7 @@ namespace ImGui
     {
         const ImVec2 mainWindowSize = GetMainViewport()->Size;
 
-        float height = 0.f;
+        float height = NOTIFY_PADDING_Y * 6.f; // Start with double padding as a safe zone
 
         std::lock_guard lock(notificationsMutex);
         for (size_t i = 0; i < notifications.size(); ++i)
@@ -507,19 +507,55 @@ namespace ImGui
             //PushStyleColor(ImGuiCol_Text, textColor);
             SetNextWindowBgAlpha(opacity);
 
-            #if NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW
-                short mainMonitorId = static_cast<ImGuiViewportP*>(GetMainViewport())->PlatformMonitor;
+            ImVec2 windowPos;
 
-                ImGuiPlatformIO& platformIO = GetPlatformIO();
-                ImGuiPlatformMonitor& monitor = platformIO.Monitors[mainMonitorId];
+#if NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW
+            short mainMonitorId = static_cast<ImGuiViewportP*>(GetMainViewport())->PlatformMonitor;
+            ImGuiPlatformIO& platformIO = GetPlatformIO();
+            ImGuiPlatformMonitor& monitor = platformIO.Monitors[mainMonitorId];
+#else
+            ImVec2 mainWindowPos = GetMainViewport()->Pos;
+#endif
 
-                // Set notification window position to bottom right corner of the monitor
-                SetNextWindowPos(ImVec2(monitor.WorkPos.x + monitor.WorkSize.x - NOTIFY_PADDING_X, monitor.WorkPos.y + monitor.WorkSize.y - NOTIFY_PADDING_Y - height), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
-            #else
-                // Set notification window position to bottom right corner of the main window, considering the main window size and location in relation to the display
-                ImVec2 mainWindowPos = GetMainViewport()->Pos;
-                SetNextWindowPos(ImVec2(mainWindowPos.x + mainWindowSize.x - NOTIFY_PADDING_X, mainWindowPos.y + mainWindowSize.y - NOTIFY_PADDING_Y - height), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
-            #endif
+            // Determine the notification position based on NOTIFY_START_CORNER
+            if (NOTIFY_START_CORNER == "topleft")
+            {
+                windowPos = ImVec2(NOTIFY_PADDING_X, NOTIFY_PADDING_Y + height);
+            }
+            else if (NOTIFY_START_CORNER == "topright")
+            {
+#if NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW
+                windowPos = ImVec2(monitor.WorkSize.x - NOTIFY_PADDING_X, NOTIFY_PADDING_Y + height);
+#else
+                windowPos = ImVec2(mainWindowSize.x - NOTIFY_PADDING_X, NOTIFY_PADDING_Y + height);
+#endif
+            }
+            else if (NOTIFY_START_CORNER == "bottomleft")
+            {
+#if NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW
+                windowPos = ImVec2(NOTIFY_PADDING_X, monitor.WorkSize.y - NOTIFY_PADDING_Y - height);
+#else
+                windowPos = ImVec2(NOTIFY_PADDING_X, mainWindowSize.y - NOTIFY_PADDING_Y - height);
+#endif
+            }
+            else // default to "bottomright" or if NOTIFY_START_CORNER is invalid
+            {
+#if NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW
+                windowPos = ImVec2(monitor.WorkSize.x - NOTIFY_PADDING_X, monitor.WorkSize.y - NOTIFY_PADDING_Y - height);
+#else
+                windowPos = ImVec2(mainWindowSize.x - NOTIFY_PADDING_X, mainWindowSize.y - NOTIFY_PADDING_Y - height);
+#endif
+            }
+
+#if NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW
+            windowPos.x += monitor.WorkPos.x; // Add monitor position if rendering outside
+            windowPos.y += monitor.WorkPos.y;
+#else
+            windowPos.x += mainWindowPos.x; // Add main window position if rendering inside
+            windowPos.y += mainWindowPos.y;
+#endif
+
+            SetNextWindowPos(windowPos, ImGuiCond_Always, ImVec2(1.0f, 1.0f));
 
             // Set notification window flags
             if (!NOTIFY_USE_DISMISS_BUTTON && currentToast->getOnButtonPress() == nullptr)

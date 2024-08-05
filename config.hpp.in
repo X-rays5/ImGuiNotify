@@ -34,4 +34,7 @@
 // If true, the notifications will be rendered in the corner of the monitor, otherwise in the corner of the main window (requires ImGui docking)
 #define NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW @NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW@
 
+// Set the corner the notifications will be rendered in (topleft, topright, bottomleft, bottomright)
+#define NOTIFY_START_CORNER "@NOTIFY_START_CORNER@"
+
 #endif // CONFIG_HPP

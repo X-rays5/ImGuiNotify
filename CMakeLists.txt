@@ -37,6 +37,9 @@ set(NOTIFY_RENDER_LIMIT 0)
 # If true, the notifications will be rendered in the corner of the monitor, otherwise in the corner of the main window (required ImGui docking)
 set(NOTIFY_RENDER_OUTSIDE_MAIN_WINDOW false)
 
+# Set the corner the notifications will be rendered in (topleft, topright, bottomleft, bottomright)
+set(NOTIFY_START_CORNER "topright")
+
 # Configure the config.hpp file
 file(REMOVE ${CMAKE_CURRENT_SOURCE_DIR}/include/ImGuiNotify/config.hpp)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/ImGuiNotify/config.hpp)
